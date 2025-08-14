@@ -207,6 +207,30 @@ def _generate_build_info_json_from_existing_build(
         return False
 
 
+def _ensure_espidf_arduino_sdkconfig(board: Board, build_dir: Path) -> None:
+    """Create sdkconfig file enforcing CONFIG_FREERTOS_HZ=1000 when needed.
+
+    When the Arduino framework is used alongside ESP-IDF, PlatformIO expects a
+    custom *sdkconfig* file to set ``CONFIG_FREERTOS_HZ=1000``. Board
+    definitions may provide this value via ``customsdk`` as a ``-D`` define, but
+    PlatformIO interprets ``custom_sdkconfig`` as a file path. This helper
+    generates the required file and updates the board configuration.
+    """
+
+    frameworks = {f.strip() for f in (board.framework or "").split(",")}
+    if not {"arduino", "espidf"}.issubset(frameworks):
+        return
+
+    sdkconfig_path = build_dir / f"sdkconfig.{board.board_name}"
+    try:
+        sdkconfig_path.write_text("CONFIG_FREERTOS_HZ=1000\n")
+    except Exception as e:  # pragma: no cover - best effort
+        warnings.warn(f"Failed to write sdkconfig: {e}")
+
+    # Ensure PlatformIO uses this file
+    board.customsdk = sdkconfig_path.name
+
+
 def _apply_board_specific_config(
     board: Board,
     platformio_ini_path: Path,
@@ -220,6 +244,9 @@ def _apply_board_specific_config(
     # Use centralized path management
     paths = FastLEDPaths(board.board_name)
     paths.ensure_directories_exist()
+
+    # Create custom sdkconfig if using Arduino+ESP-IDF
+    _ensure_espidf_arduino_sdkconfig(board, platformio_ini_path.parent)
 
     # Generate platformio.ini content using the enhanced Board method
     config_content = board.to_platformio_ini(
@@ -1205,6 +1232,9 @@ class PioCompiler(Compiler):
         """Internal build method without lock management."""
         # Print building banner first
         print(_create_building_banner(example))
+
+        # Ensure required sdkconfig exists for dual Arduino/ESP-IDF builds
+        _ensure_espidf_arduino_sdkconfig(self.board, self.build_dir)
 
         # Copy example source to build directory
         project_root = _resolve_project_root()
