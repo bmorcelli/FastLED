@@ -401,7 +401,7 @@ ESP32_C2_DEVKITM_1 = Board(
     platform="https://github.com/pioarduino/platform-espressif32/releases/download/stable/platform-espressif32.zip",
     framework="arduino, espidf",
     defines=[
-        "CONFIG_FREERTOS_HZ=1000",
+        "-DCONFIG_FREERTOS_HZ=1000",
     ],
 )
 
