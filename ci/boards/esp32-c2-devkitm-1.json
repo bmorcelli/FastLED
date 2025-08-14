@@ -27,7 +27,8 @@
   },
   "espidf": {
     "custom_sdkconfig": [
-      "CONFIG_IDF_TARGET=\"esp32c2\"" 
+      "CONFIG_IDF_TARGET=\"esp32c2\"",
+      "CONFIG_FREERTOS_HZ=1000"
     ]
   },
   "url": "https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/esp8684/esp8684-devkitm-1/user_guide.html",
