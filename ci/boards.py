@@ -400,7 +400,7 @@ ESP32_C2_DEVKITM_1 = Board(
     real_board_name="esp32-c2-devkitm-1",
     platform="https://github.com/pioarduino/platform-espressif32/releases/download/stable/platform-espressif32.zip",
     framework="arduino, espidf",
-    customsdk="CONFIG_FREERTOS_HZ=1000",
+    customsdk="-DCONFIG_FREERTOS_HZ=1000",
 )
 
 ESP32_C3_DEVKITM_1 = Board(
