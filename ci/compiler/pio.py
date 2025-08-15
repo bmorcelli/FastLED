@@ -1038,6 +1038,15 @@ def _init_platformio_build(
             build_dir=build_dir,
         )
 
+    # Create sdkconfig.defaults if framework has "espidf" in it for esp32c2 board
+    frameworks = {f.strip() for f in (board.framework or "").split(",")}
+    if {"arduino", "espidf"}.issubset(frameworks):
+        sdkconfig_path = build_dir / f"sdkconfig.defaults"
+        print(f"Creating sdkconfig.defaults file")
+        try:
+            sdkconfig_path.write_text("CONFIG_FREERTOS_HZ=1000\nCONFIG_AUTOSTART_ARDUINO=y\n")
+        except Exception as e: 
+            warnings.warn(f"Failed to write sdkconfig: {e}")
     # Final platformio.ini is already written by _apply_board_specific_config
     # No need to write it again
 
