@@ -398,7 +398,6 @@ GIGA_R1 = Board(
 ESP32_C2_DEVKITM_1 = Board(
     board_name="esp32c2",
     real_board_name="esp32-c2-devkitm-1",
-    use_pio_run=True,
     platform="https://github.com/pioarduino/platform-espressif32/releases/download/stable/platform-espressif32.zip",
     framework="arduino, espidf",
 )
