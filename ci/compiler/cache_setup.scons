@@ -37,25 +37,6 @@ except (NameError, Exception):
     has_projenv = False
     projenv = None
 
-# Skip cache setup for frameworks that don't work well with cached compilers
-frameworks: List[str] = []
-try:
-    if env is not None:
-        fw_val = env.get("PIOFRAMEWORK", [])
-        if isinstance(fw_val, str):
-            frameworks = [fw.strip().lower() for fw in fw_val.split(",")]
-        elif isinstance(fw_val, (list, tuple)):
-            frameworks = [str(fw).lower() for fw in fw_val]
-except Exception:
-    pass
-
-# Some ESP32 environments mix Arduino and ESP-IDF frameworks.  The cache
-# wrappers interfere with ESP-IDF's linker script generation in this case, so
-# disable cache usage entirely when both stacks are active.
-if "arduino" in frameworks and "espidf" in frameworks:
-    print(f"Skipping cache setup for frameworks: {frameworks}")
-    sys.exit(0)
-
 # Add project root to Python path for fake compiler imports
 # Note: We're in the build directory, go up to project root
 current_dir = Path(os.getcwd()).resolve()
